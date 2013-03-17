@@ -1,87 +1,375 @@
 <!DOCTYPE html>
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-   
-                <title>SAI YAs</title>
-                
-                <link rel="stylesheet" href="css/jquery.mobile-1.1.1.min.css" />
-                <script src="js/jquery-1.7.1.min.js"></script>
-                <script src="js/jquery.mobile-1.1.1.min.js"></script>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <title>
+        </title>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+        <!--<link rel="stylesheet" href="css/my.css" />-->
         <link rel="apple-touch-icon" href="img/logo.jpg">
+		
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js">
+            </script>
+        <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js">
+            </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"> </script>
+        <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.validate/1.6/jquery.validate.js" />
+       <!-- <script src="js/my.js"> -->
+            </script>
+        <!-- User-generated css -->
+        <style>
+            label.error {
+				color: red;
+				font-size: 16px;
+				font-weight: normal;
+				line-height: 1.4;
+				margin-top: 0.5em;
+				width: 100%;
+				float: none;
+            }
             
+            @media screen and (orientation: portrait){
+				label.error { margin-left: 0; display: block; }
+            }
+            
+            @media screen and (orientation: landscape){
+				label.error { display: inline-block; margin-left: 22%; }
+            }
+            
+            em { color: red; font-weight: bold; padding-right: .25em; }
+            </style>
+        <!-- User-generated js -->
+		
+		
+        <script type="text/javascript">
+            $(document).on("mobileinit", function() {
+                           $.extend( $.mobile , {
+                                    pageLoadErrorMessage: 'Either the page cannot be found or it cannot be loaded.'
+                                    });
+                           });
+            $(document).on("pageinit","#page2", function() {
+                           $("#email_id").val(localStorage.getItem("saiyazcEmailId"));
+                           $.getJSON('http://region7saicenters.org/saiyazc/api/Gayathris/count/all', function (data) {
+                                 //alert(data.total_count);
+                                   //  $("#email_id").val(data.total_count);
+
+                         //  $("#email_id").val(localStorage.getItem("saiyazcemailId"));
+                           //$("#totalCount").innerHTML = 123;
+                           document.getElementById("totalCount").innerHTML=data.total_count;
+                           });
+                           //stsrt validation
+                                                      
+                           $("#gcForm").validate({
+                                                 rules: {
+                                                 email_id: {
+                                                 required: true,
+                                                 email:true
+                                                 },
+                                                 count: {
+                                                 required: true
+                                                 
+                                                 }
+                                                 },
+                                                 messages: {
+                                                 
+                                                 email_id: "Please enter a valid email address",
+                                                 count: "digits only max 9999"
+                                                 }
+                                                 });
+            
+                           $("#count").keydown(function (event) {
+                                               if (event.shiftKey) {
+                                               event.preventDefault();
+                                               }
+                                               
+                                               if (event.keyCode == 46 || event.keyCode == 8) {
+                                               }
+                                               else {
+                                               if (event.keyCode < 95) {
+                                               if (event.keyCode < 48 || event.keyCode > 57) {
+                                               event.preventDefault();
+                                               }
+                                               }
+                                               else {
+                                               if (event.keyCode < 96 || event.keyCode > 105) {
+                                               event.preventDefault();
+                                               }
+                                               }
+                                               }
+                                               });
+                           
+                           $("#email_id").focusout(function() {
+                                           localStorage.set("saiyazcEmailId",$("#email_id").val())
+                                                   });
+                        
+                           $("#gcForm").submit(function(){
+                                              if($("#gcForm").valid()){
+                                               var req = '{"email_id": '+'"'+$("#email_id").val()+'"'+',"name": "JagsN1","country": "us","region": "7","count": '+'"'+$("#count").val()+'"'+',"comments": "Good 03/16"}';
+                                               //alert("Request: "+req);
+                                              $.ajax({
+                                                     type: "POST",
+                                                     url: "http://region7saicenters.org/saiyazc/api/Gayathris",
+                                                     dataType: "json",                                                   
+                                                     data:req,
+                                                     success: function(msg){
+                                                      
+                                                     //alert( "Data Saved: " + msg.id ); //Anything you want                                                     
+                                                     document.getElementById("totalCount").innerHTML=msg.total_count;
+                                                     document.getElementById("indCount").innerHTML=msg.ind_count;
+                                                     $("#count").val("");
+                                                     }
+                                                     });
+                                               }
+                                               return false;
+                                              });
+
+                           //End Validation
+                           
+                           
+                           });
+            </script>
+        
+        <script>
+            try {
+                
+                               
+            } catch (error) {
+                console.error("Your javascript has an error: " + error);
+            }
+      </script>
     </head>
     <body>
-        <div data-role="header">
-			<h1>Gayathri</h1>
-        </div>
-        
-        <form name = "gayathriCountform" action = "insertAnOffering1.php" method = "post">
-            <div data-role="fieldcontain">
+        <!-- Home -->
+        <div data-role="page" id="page1">
+            
+            <div data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Gayatri Chanting
+                </h3>
+            </div>
+            <div data-role="content">
                 
                 <ul data-role="listview">
                     <li>
-                        <a href="http://region7saicenters.org/saiyazc/Count.php">
-                            <h1>Enter Your Gayathri <br>Count for the Day</h1>
-                            <img src="img/logo.jpg" alt="Min Pin" />
-                            <p>Experience Sai's Love <br>through contemplating on him.</p>
-                        </a>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">
+                                <div style="width: 50%; height: 50%; position: relative; background-color: #fbfbfb; border: 1px solid #b8b8b8;">                            <img src="img/swami_gayatri_idol2.jpg" alt="image" style="position: absolute;  margin-left: -16px; margin-top: -18px" margin-right: -16px;/>                    </div>
+                            </div>
+                            <div class="ui-block-b">
+                                <center>
+                                    <font color="#8B0000" face="Helvetica" size="+1">
+                                        Om Bhur Bhuva Suvah <br>
+                                        Tat Savithur Varenyam <br>
+                                        Bhargo Devasya Dheemahi <br>
+                                        Dhiyo Yonah Prachodayat
+                                        
+                                    </font>
+                                </center>
+                            </div>
+                            <div class="ui-block-a">       </div>
+                            <div class="ui-block-b">       </div>
+                        </div>
                     </li>
                     <li>
-                        <h4>Email: </h4>
+                        <div data-role="content">
+                            
+                            <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                We meditate on that most adorable, most desirable and most enchanting luster
+                                (effulgence) of our supreme Lord, who is our creator, inspirer and source of
+                                eternal Joy. May this light inspire and illumine our intellect (and dispel
+                                the darkness).
+                            </i></font>
+                            
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <!--a data-role="button" href="contribute.html">
+                             Lets Chant
+                             </a -->
+                            
+                            
+                            <div class="ui-grid-a">
+                                <div class="ui-block-a">
+                                    <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                        Lets Chant Now....
+                                    </i></font>
+                                </div>
+                                <div class="ui-block-b">
+                                    <audio controls>
+                                        <source src="audio/gayatri.mp3">
+                                            
+                                            </audio>
+                                    
+                                </div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </li>
+                </ul>
+			</div>
+            <!--div class="footer" data-theme="b" data-role="footer" data-position="fixed">
+             <h3>
+             Tuned for  Sai Ya Zonal Conference
+             </h3>
+             </div -->
+			
+			
+			
+			
+			<div data-role="footer" data-position="fixed"  >
+                <nav data-role="navbar">
+                    <ul>
+                        <li><a href="#page1" data-icon="home">Home</a></li>
+                        <li><a href="#page2" data-icon="grid" data-transition="slide">Contribute</a></li>
+                        <li><a href="#page3" data-icon="gear" data-transition="slide">Benefits</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+		
+		
+		<div data-role="page" id="page2">
+            <div data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Gayatri Chanting
+                </h3>
+            </div>
+            <div data-role="content">
+                <ul data-role="listview">
+                    
+                    <li>
                         
-                        <input type="text" name="email_id" id="email_id" value=""  />
-                    </li>
-                    <li>
-                        <h1>Count : </h1>
-                        <input type="Number" name="count" id="count" value="9"  />
+                        <font color="#8B0000" face="Helvetica" size="+1"> Enter Your Gayatri Count For the day</font>
+                        <br>
+                        <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                            Experience the divine love and protection by chanting and contemplation of this sacred prayer.
+                        </i></font>
+                        <img src="img/logo.jpg" alt="Min Pin" />
                         
                     </li>
                     
                     <li>
-                        <input type="submit" value="Submit">
-                            </li>
+                       <!-- <form id="gcForm" name="gcForm" action ="Contribute.php" method = "post" > -->
+                            <form id="gcForm" name="gcForm" > 
+                            
+                            <div data-role="fieldcontain">
+                                <input data-val="true" data-val-required="The Email field is required." id="email_id" name="email_id" placeholder="Your Email Id Here" type="email" value="" />
+                            </div>
+                            
+                            <fieldset class="ui-grid-a">
+                                <div class="ui-block-a"><input data-val="true"  id="count" name="count" placeholder="Your Count Here" id="count" maxlength="4" type="number" /></div>
+                                <div class="ui-block-b"><button type="submit"  id="countSubmit" data-theme="b">Submit</button></div>
+                            </fieldset>
+                            
+                            
+                        </form>
+                        
+                    </li>
+                    <li>
+                        <div data-role="fieldcontain">
+                            <fieldset class="ui-grid-a">
+                                
+                                <div class="ui-block-a"><h1>Your Count</h1></div>
+                                <div class="ui-block-b"><span class='ui-li-count' id="indCount"></span></div>
+                                
+                            </fieldset>
+                            
+                        </div>
+                        
+                    </li>
+                    <li>
+                        <div data-role="fieldcontain">
+                            <fieldset class="ui-grid-a">
+                                
+                                <div class="ui-block-a"><h1>Total Count</h1></div>
+                                <div class="ui-block-b"><span class='ui-li-count' id="totalCount"> </span></div>
+                                
+                            </fieldset>
+                            
+                        </div>
+                        
+                    </li>
+                    
                 </ul>
-                
-                
-                
-                
             </div>
-        </form>
-        
-        <div data-role="footer" data-position="fixed">
-            <nav data-role="navbar">
-                <ul>
-                    <li><a href="http://region7saicenters.org/saiyazc/index.htm" data-icon="home">Home</a></li>
-                    <li><a href="http://region7saicenters.org/saiyazc/Count.php" data-icon="grid">Count</a></li>
-                    <li><a href="http://region7saicenters.org/saiyazc/Info.html" data-icon="gear">Gayathri</a></li>
-                </ul>
-            </nav>
+            <div data-role="footer" data-position="fixed"  >
+                <nav data-role="navbar">
+                    <ul>
+                        <li><a href="#page1" data-icon="home" data-transition="slide">Home</a></li>
+                        <li><a href="#page2" data-icon="grid" >Contribute</a></li>
+                        <li><a href="#page3" data-icon="gear" data-transition="slide">Benefits</a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
-    </body></html>
-
-
-
-
-
+        <div data-role="page" id="page3">
+            <div data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Gayatri Chanting
+                </h3>
+            </div>
+            <div data-role="content">
+                <ul data-role="listview">
+					<li>
+                        
+                        <font color="#8B0000" face="Helvetica" size="+1"> Sathya Sai speaks on benefits of Gayatri chanting</font>
+                        <img src="img/logo.jpg" alt="Min Pin" />
+                        
+					</li>
+                    <li>
+						<div data-role="content">
+                            <ul data-role="listview">
+                                <li>
+                                    <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                        The effulgence of the Divine will descend on you and illumine your intellect and light your path when this mantra is chanted.
+                                    </i></font>
+                                </li>
+                                <li>
+                                    <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                        Gayatri is the bestower of all that is beneficial.
+                                    </i></font>
+                                </li>
+							    <li>
+                                    <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                        It is an essential requisite for the young because it ensures a bright and auspicious future for them.
+                                    </i></font>
+                                </li>
+                                <li>
+                                    <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                        The attitude of surrender will grow in us as we recite regularly the Gayatri manthra.
+                                        
+                                    </i></font>
+                                </li>
+                                <li>
+                                    <font color="#8B0000" face="Helvetica" size="-1"> <i>
+                                        The Gayatri Mantra is not related to any particular sect, caste, idol, or institution. It is the torch of spiritual wisdom. 
+                                        
+                                    </i></font>
+                                </li>
+                                <ul>
+                                    </div>
+						
+                        
+                        
+                    </li>
+                    
+				</ul>
+            </div>
+            <div data-role="footer" data-position="fixed"  >
+                <nav data-role="navbar">
+                    <ul>
+                        <li><a href="#page1" data-icon="home"data-transition="slide" >Home</a></li>
+                        <li><a href="#page2" data-icon="grid" data-transition="slide">Contribute</a></li>
+                        <li><a href="#page3" data-icon="gear" >Benefits</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </body>
+</html>
